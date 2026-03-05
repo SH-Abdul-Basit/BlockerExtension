@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stricked Keyword Blocker</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <!-- <h1 class="title">Blocker</h1> -->
+    <form class="block-form">
+      <label for="blockWord">Keyword Word</label>
+      <input type="text" id="blockWord" name="blockWord" placeholder="Enter a word to block">
+      <label for="folllowSchedule">Follow Schedule</label>
+      <input type="checkbox" id="followSchedule" name="followSchedule">
+      <div class="actions">
+        <button type="button" id="add" class="primary">Add</button>
+        <button type="button" id="settings" class="secondary">Settings</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
