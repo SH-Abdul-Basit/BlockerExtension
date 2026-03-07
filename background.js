@@ -1,3 +1,7 @@
+// TODO: Sending message from background script to content script to get the HTML content of the page 
+// and then checking for blocked words in the content instead of just the URL. This is to prevent users from bypassing the blocker by using URL shorteners or other methods to hide the URL.
+// Also resolving error when sending request from backgrounds script when content is not loaded
+
 // Is run the first tie the extension is installed and sets up the local storage for blocked words and password.
 browser.runtime.onInstalled.addListener(() => {
     console.log("Extension installed");
@@ -12,37 +16,33 @@ function checkBlockedWord(url, word) {
 }
 
 function closeSpecificTab(tabId) {
-  browser.tabs.remove(tabId).then(() => {
-    console.log(`Closed tab: ${tabId}`);
-  }).catch((error) => {
-    console.error(`Error closing tab: ${error}`);
-  });
+  browser.tabs.remove(tabId);
 }
 
-async function handleContentBlocking(message) {
-  try {
-    // Query for the active tab in the current window
-    const tabs = await browser.tabs.query({ currentWindow: true, active: true });
+// async function handleContentBlocking(message) {
+//   try {
+//     // Query for the active tab in the current window
+//     const tabs = await browser.tabs.query({ currentWindow: true, active: true });
     
-    // The query returns an array; the first element is the active tab
-    const activeTab = tabs[0];
-    const tabId = activeTab.id;
+//     // The query returns an array; the first element is the active tab
+//     const activeTab = tabs[0];
+//     const tabId = activeTab.id;
 
-    if (message.dataType === "pageContent") {
-        closeTabsWithBlockedWords(message.content, tabId);
-    }
+//     if (message.dataType === "pageContent") {
+//         closeTabsWithBlockedWords(message.content, tabId);
+//     }
 
-  } catch (error) {
-    console.error(`Error getting active tab: ${error}`);
-  }
-}
+//   } catch (error) {
+//     console.error(`Error getting active tab: ${error}`);
+//   }
+// }
 
 function closeTabsWithBlockedWords(text, tabId) {
     const blockedWords = JSON.parse(localStorage.getItem("blockedWords"));
     for (let word of blockedWords) {
         if (!word.followSchedule || (word.followSchedule && checkWithinSchedule())) {
             if (text && checkBlockedWord(text, word.word)) {
-                console.log("word: " + word.word);
+                // console.log("word: " + word.word);
                 closeSpecificTab(tabId);
             }
         }
@@ -71,4 +71,11 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 
-browser.runtime.onMessage.addListener(handleContentBlocking);
+browser.runtime.onMessage.addListener((request) => {
+    if (request.type === "html_content") {
+        browser.tabs.query({ active: true, currentWindow: true })
+        .then((tabs) => {
+            closeTabsWithBlockedWords(request.data, tabs[0].id);
+        });
+    }
+});

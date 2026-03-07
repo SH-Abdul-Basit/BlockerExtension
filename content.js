@@ -1,24 +1,33 @@
-function sendContentToBackground() {
-    const pageContent = document.body.innerHTML;
-    browser.runtime.sendMessage({
-        dataType: "pageContent",
-        content: pageContent
-    });
-}
-sendContentToBackground();
-setInterval(sendContentToBackground, 5000);
+// function sendContentToBackground() {
+//     const pageContent = document.body.innerHTML;
+//     browser.runtime.sendMessage({
+//         dataType: "pageContent",
+//         content: pageContent
+//     });
+// }
+// sendContentToBackground();
+// setInterval(sendContentToBackground, 5000);
+const pageContent = document.body.innerHTML;
+browser.runtime.sendMessage({
+    type: "html_content",
+    data: pageContent
+})
 
+// browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//     if (request.command === "send_html") {
+//         console.log("Received command to send HTML content.");
+//     }
 
-// TODO: Mutation for observing changes in the page content
-// const observerCallback = function(mutationsList, observer) {
-//     console.log(mutationsList);
-//     // for (const mutation of mutationsList) {
-//     //     if (mutation.type === 'childList') {
-//     //         console.log('A child node has been added or removed.');
-//     //     } else if (mutation.type === 'attributes') {
-//     //         console.log(`The ${mutation.attributeName} attribute was modified.`);
-//     //     }
-//     // }
-// };
+//   if (request.command === "send_html") {
+//     // Process the message and interact with the webpage DOM
+//     //alert(request.data.message);
+//     console.log("Received command to send HTML content.");
 
-// const observer = new MutationObserver(observerCallback);
+//     // Send a response back to the background script
+//     sendResponse({ result: "Message received and processed!" });
+//   }
+
+  // To send an asynchronous response using a Promise, return true or a Promise object
+  // return Promise.resolve({ result: "Message received asynchronously!" });
+// });
+
