@@ -9,9 +9,9 @@
 // setInterval(sendContentToBackground, 5000);
 const pageContent = document.body.innerHTML;
 browser.runtime.sendMessage({
-    type: "html_content",
-    data: pageContent
-})
+  type: "html_content",
+  data: pageContent
+});
 
 // browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 //     if (request.command === "send_html") {

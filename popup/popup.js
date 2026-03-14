@@ -1,3 +1,4 @@
+// Blocking keywords
 const input = document.getElementById("blockWord");
 const addBt = document.getElementById("add");
 const settingsBt = document.getElementById("settings");
@@ -27,5 +28,15 @@ settingsBt.addEventListener("click", () => {
         url: browser.runtime.getURL("settings/settings.html")
     });
 });
+
+// Disabling background musci playing
+const disableBGMCheckbox = document.getElementById("disable-BGM");
+
+const checkedBGB = JSON.parse(localStorage.getItem("disableBGM"));
+disableBGMCheckbox.checked = checkedBGB;
+
+disableBGMCheckbox.addEventListener("change", () => {
+    localStorage.setItem("disableBGM", disableBGMCheckbox.checked);
+})
 
 // localStorage.clear();   

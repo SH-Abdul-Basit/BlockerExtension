@@ -8,6 +8,7 @@ browser.runtime.onInstalled.addListener(() => {
     localStorage.setItem("blockedWords", "[]");
     localStorage.setItem("password", "");
     localStorage.setItem("schedule", JSON.stringify({ startTime: null, endTime: null }));
+    localStorage.setItem("disableBGM", JSON.stringify(false));
 });
 
 function checkBlockedWord(url, word) {
