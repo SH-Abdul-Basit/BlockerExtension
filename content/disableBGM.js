@@ -16,9 +16,25 @@ browser.runtime.onMessage.addListener((request) => {
     }
 }); 
 
-window.addEventListener("blur", () => {
-    const checkedBGB = JSON.parse(localStorage.getItem("disableBGM"));
-    if (checkedBGB) {
+const handleWindowBGM = async () => {
+    // Accessing the local storage of that page 
+    // We need to get the local storage from the background script
+    let checkedBGM = await browser.storage.local.get("disableBGM");
+    checkedBGM = JSON.parse(checkedBGM.disableBGM);
+
+    if (checkedBGM) {
         pauseVideo();
     }
-});
+};
+
+// const handleWindowBGM = () => {
+//     // Accessing the local storage of that page 
+//     // We need to get the local storage from the background script
+//     const checkedBGM = JSON.parse(localStorage.getItem("disableBGM"));
+//     console.log("blur");
+//     if (checkedBGM) {
+//         pauseVideo();
+//     }
+// };
+
+window.addEventListener("blur", handleWindowBGM);

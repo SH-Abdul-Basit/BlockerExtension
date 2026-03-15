@@ -32,11 +32,18 @@ settingsBt.addEventListener("click", () => {
 // Disabling background musci playing
 const disableBGMCheckbox = document.getElementById("disable-BGM");
 
-const checkedBGB = JSON.parse(localStorage.getItem("disableBGM"));
-disableBGMCheckbox.checked = checkedBGB;
+const setBGMChecboxOnload = async () => {
+    let checkedBGM = await browser.storage.local.get("disableBGM");
+    checkedBGM = JSON.parse(checkedBGM.disableBGM);
+    disableBGMCheckbox.checked = checkedBGM;
+};
+
+setBGMChecboxOnload();
+
 
 disableBGMCheckbox.addEventListener("change", () => {
-    localStorage.setItem("disableBGM", disableBGMCheckbox.checked);
+    // localStorage.setItem("disableBGM", disableBGMCheckbox.checked);
+     browser.storage.local.set({ "disableBGM": disableBGMCheckbox.checked });
 })
 
 // localStorage.clear();   

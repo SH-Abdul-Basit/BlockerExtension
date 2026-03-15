@@ -3,13 +3,19 @@
 // Also resolving error when sending request from backgrounds script when content is not loaded
 
 // Is run the first tie the extension is installed and sets up the local storage for blocked words and password.
-browser.runtime.onInstalled.addListener(() => {
+const initStorage = async () => {
     console.log("Extension installed");
+    localStorage.clear();
+    await browser.storage.local.clear();
+
     localStorage.setItem("blockedWords", "[]");
     localStorage.setItem("password", "");
     localStorage.setItem("schedule", JSON.stringify({ startTime: null, endTime: null }));
-    localStorage.setItem("disableBGM", JSON.stringify(false));
-});
+    // localStorage.setItem("disableBGM", JSON.stringify(true));
+    browser.storage.local.set({ "disableBGM": JSON.stringify(true) });
+};
+
+browser.runtime.onInstalled.addListener(initStorage);
 
 function checkBlockedWord(url, word) {
     const pattern = new RegExp(word, "i");
@@ -40,6 +46,7 @@ function closeSpecificTab(tabId) {
 
 function closeTabsWithBlockedWords(text, tabId) {
     const blockedWords = JSON.parse(localStorage.getItem("blockedWords"));
+    if (b)
     for (let word of blockedWords) {
         if (!word.followSchedule || (word.followSchedule && checkWithinSchedule())) {
             if (text && checkBlockedWord(text, word.word)) {
