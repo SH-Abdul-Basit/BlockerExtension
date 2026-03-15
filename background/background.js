@@ -46,7 +46,6 @@ function closeSpecificTab(tabId) {
 
 function closeTabsWithBlockedWords(text, tabId) {
     const blockedWords = JSON.parse(localStorage.getItem("blockedWords"));
-    if (b)
     for (let word of blockedWords) {
         if (!word.followSchedule || (word.followSchedule && checkWithinSchedule())) {
             if (text && checkBlockedWord(text, word.word)) {

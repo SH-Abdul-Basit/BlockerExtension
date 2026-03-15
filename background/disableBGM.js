@@ -1,6 +1,7 @@
 const handleTabChange = async (activeInfo) => {
     // const checkedBGM = JSON.parse(localStorage.getItem("disableBGM"));
-    const checkedBGM = await browser.storage.local.get("disableBGM");
+    let checkedBGM = await browser.storage.local.get("disableBGM");
+    checkedBGM = JSON.parse(checkedBGM.disableBGM);
     if (checkedBGM) {
         const prevTab = await browser.tabs.get(activeInfo.previousTabId);
         if (checkBlockedWord(prevTab.url, "youtube")) {
