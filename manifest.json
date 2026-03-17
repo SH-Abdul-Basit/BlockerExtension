@@ -1,7 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Best Blocker",
-  "version": "1.0",
+  "name": "ClearTab",
+  "version": "0.1",
+
+  "browser_specific_settings": {
+  "gecko": {
+    "id": "ClearTab@gmail.com",
+    "data_collection_permissions": {
+          "required": [
+             "locationInfo"
+          ]
+    }
+   }
+  },
 
   "action": {
     "default_popup": "popup/popup.html"
