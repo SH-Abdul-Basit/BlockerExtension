@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "ClearTab",
-  "version": "0.1",
+  "name": "Content Keyword Blocker",
+  "version": "0.2",
 
   "browser_specific_settings": {
   "gecko": {
-    "id": "ClearTab@gmail.com",
+    "id": "content-keyword-blocker@mozilla.org",
     "data_collection_permissions": {
           "required": [
              "locationInfo"
