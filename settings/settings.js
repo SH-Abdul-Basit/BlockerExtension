@@ -9,11 +9,17 @@ const endTimeInput = document.getElementById("endTime");
 const saveScheduleBt = document.getElementById("saveSchedule");
 
 saveScheduleBt.addEventListener("click", async () => {
-    // TODO: Add checking password back in
-    const startTime = startTimeInput.value;
-    const endTime = endTimeInput.value;
-    browser.storage.local.set({ startTime, endTime });
+    // Doing this way there is a path
+    // in which the schdule is not set if the password is not varified
+    if (await passwordExists()) {
+        if (await passwordVarify()) {
+            setSchedule();
+        }
+    } else {
+        setSchedule();
+    }
 });
+
 
 // let blockedWords = JSON.parse(localStorage.getItem("blockedWords"));
 
@@ -36,18 +42,15 @@ const setWordDivs = async () => {
         const wordDiv = document.createElement('div');
         wordDiv.className = 'chip';
         wordDiv.textContent = word.word;
-        wordDiv.setAttribute('title', 'Click to remove');
-        wordDiv.setAttribute('role', 'button');
-        wordDiv.tabIndex = 0;
+        // wordDiv.setAttribute('title', 'Click to remove');
+        // wordDiv.setAttribute('role', 'button');
+        // wordDiv.tabIndex = 0;
 
         // Removes the word if the user enters a specific word
         const tryRemove = async () => {
-            const { password } = await browser.storage.local.get("password");
-            // lenght > 0 means the user as not yet set the password
-            if (password.length > 0) {
-                const enteredPassword = prompt('password:');
-                if (enteredPassword === password) {
-                    removeBlockedWord(wordDiv);
+            if (await passwordExists()) {
+                if (await passwordVarify()) {
+                     removeBlockedWord(wordDiv);
                 }
             } else {
                 removeBlockedWord(wordDiv);
@@ -70,11 +73,8 @@ const setWordDivs = async () => {
 setWordDivs();
 
 passwordBt.addEventListener("click", async () => {
-    const { password } = await browser.storage.local.get("password");
-
-    if (password.length > 0) {
-        const currentPassword = prompt("Enter current password: ");
-        if (currentPassword == password) {
+    if (await passwordExists()) {
+        if (await passwordVarify()) {
             const newPassword = prompt("Enter new password: ");
             if (newPassword && newPassword.length > 0) {
                 browser.storage.local.set({ password: newPassword });
@@ -87,3 +87,26 @@ passwordBt.addEventListener("click", async () => {
         }
     }
 });
+
+const passwordVarify = async () => {
+     const { password } = await browser.storage.local.get("password");
+     const enterdPassword = prompt("Enter password: ");
+     if (enterdPassword === password) {
+        return true;
+     } else {
+        alert("Incorrect password!");
+        return false;
+     }
+};
+
+const passwordExists = async () => {
+    const { password } = await browser.storage.local.get("password");
+    // lenght > 0 means the user as not yet set the password
+    return password && password.length > 0;
+};
+
+const setSchedule = () => {
+    const startTime = startTimeInput.value;
+    const endTime = endTimeInput.value;
+    browser.storage.local.set({ startTime, endTime });
+};
