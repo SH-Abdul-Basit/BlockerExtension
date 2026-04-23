@@ -1,18 +1,17 @@
-// TODO: Sending message from background script to content script to get the HTML content of the page 
-// and then checking for blocked words in the content instead of just the URL. This is to prevent users from bypassing the blocker by using URL shorteners or other methods to hide the URL.
-// Also resolving error when sending request from backgrounds script when content is not loaded
-
 // Is run the first tie the extension is installed and sets up the local storage for blocked words and password.
 const initStorage = async () => {
     console.log("Extension installed");
-    localStorage.clear();
     await browser.storage.local.clear();
 
-    localStorage.setItem("blockedWords", "[]");
-    localStorage.setItem("password", "");
-    localStorage.setItem("schedule", JSON.stringify({ startTime: null, endTime: null }));
-    // localStorage.setItem("disableBGM", JSON.stringify(true));
-    browser.storage.local.set({ "disableBGM": JSON.stringify(true) });
+    const data = {
+        blockedWords: [],
+        disableBGM: false,
+        password: "",
+        startTime: "",
+        endTime: ""
+    };
+
+    browser.storage.local.set(data);
 };
 
 browser.runtime.onInstalled.addListener(initStorage);
@@ -26,46 +25,45 @@ function closeSpecificTab(tabId) {
   browser.tabs.remove(tabId);
 }
 
-// async function handleContentBlocking(message) {
-//   try {
-//     // Query for the active tab in the current window
-//     const tabs = await browser.tabs.query({ currentWindow: true, active: true });
-    
-//     // The query returns an array; the first element is the active tab
-//     const activeTab = tabs[0];
-//     const tabId = activeTab.id;
+async function closeTabsWithBlockedWords(text, tabId) {
+    const { blockedWords } = await browser.storage.local.get("blockedWords");
+    console.log(blockedWords);
+    // TODO: The keyword detection fails if a keyword is set with sechedule and then that same keyword is removed
+    // and then add back with different schedule which is not yet 
+    // TODO: Why does blockedWords sometimes become undefined?
 
-//     if (message.dataType === "pageContent") {
-//         closeTabsWithBlockedWords(message.content, tabId);
-//     }
-
-//   } catch (error) {
-//     console.error(`Error getting active tab: ${error}`);
-//   }
-// }
-
-function closeTabsWithBlockedWords(text, tabId) {
-    const blockedWords = JSON.parse(localStorage.getItem("blockedWords"));
-    for (let word of blockedWords) {
-        if (!word.followSchedule || (word.followSchedule && checkWithinSchedule())) {
-            if (text && checkBlockedWord(text, word.word)) {
-                // console.log("word: " + word.word);
-                closeSpecificTab(tabId);
+    if (blockedWords) { // Temporary solution to detect when blockedWords becomes undefined
+        for (let word of blockedWords) {
+            console.log("FollowSchdule: " + word.followSchedule, "CheckSchedule: " + await checkWithinSchedule());
+            if (word.followSchedule) {
+                // This if is inside inorder to do nothing to a following word even if it is a match
+                if (await checkWithinSchedule()) {
+                    if (text && checkBlockedWord(text, word.word)) {
+                    closeSpecificTab(tabId);
+                    }
+                } 
+            } else {
+                console.log("Not following words...");
+                if (text && checkBlockedWord(text, word.word)) {
+                    closeSpecificTab(tabId);
+                }
             }
         }
     }
+    
 }
 
-function checkWithinSchedule() {
-    const schedule = JSON.parse(localStorage.getItem("schedule"));
+async function checkWithinSchedule() {
+    const { startTime } = await browser.storage.local.get("startTime");
+    const { endTime } = await browser.storage.local.get("endTime");
 
-    if (!schedule.startTime || !schedule.endTime) {
+    if (!startTime || !endTime) {
         return false;
     }
 
     const now = new Date();
-    const [startHour, startMinute] = schedule.startTime.split(":").map(Number);
-    const [endHour, endMinute] = schedule.endTime.split(":").map(Number);
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
     const startDate = new Date();
     startDate.setHours(startHour, startMinute, 0, 0);
     const endDate = new Date();

@@ -4,9 +4,11 @@ const addBt = document.getElementById("add");
 const settingsBt = document.getElementById("settings");
 const followScheduleCheckbox = document.getElementById("followSchedule");
 
-function addBlockWord(word) {
-    if (!word || word.length === 0) {
-        return;
+async function addBlockWord(word) {
+    const { blockedWords } = await browser.storage.local.get("blockedWords");
+
+    if (blockedWords.includes(word)) {
+        return 
     }
 
     const entry = {
@@ -14,9 +16,10 @@ function addBlockWord(word) {
         followSchedule: followScheduleCheckbox.checked
     }
 
-    const blockedWords = JSON.parse(localStorage.getItem("blockedWords")) || [];
     blockedWords.push(entry);
-    localStorage.setItem("blockedWords", JSON.stringify(blockedWords));
+
+    browser.storage.local.set({ blockedWords })
+    // localStorage.setItem("blockedWords", JSON.stringify(blockedWords));
 }
 
 addBt.addEventListener("click", () => {

@@ -8,38 +8,30 @@ const endTimeInput = document.getElementById("endTime");
 
 const saveScheduleBt = document.getElementById("saveSchedule");
 
-saveScheduleBt.addEventListener("click", () => {
-    const schedule = JSON.parse(localStorage.getItem("schedule"));
-
-    if (schedule.startTime && schedule.endTime) {
-        const password = localStorage.getItem("password");
-        const enteredPassword = prompt('password:');
-        if (password && password.length > 0) {
-            if (enteredPassword === password) {
-                const startTime = startTimeInput.value;
-                const endTime = endTimeInput.value;
-                localStorage.setItem("schedule", JSON.stringify({ startTime, endTime }));
-            }
-        } 
-    } else {
-        // Setings for the first time, when there is no schedule set.
-        const startTime = startTimeInput.value;
-        const endTime = endTimeInput.value;
-        localStorage.setItem("schedule", JSON.stringify({ startTime, endTime }));
-    }
+saveScheduleBt.addEventListener("click", async () => {
+    // TODO: Add checking password back in
+    const startTime = startTimeInput.value;
+    const endTime = endTimeInput.value;
+    browser.storage.local.set({ startTime, endTime });
 });
 
-let blockedWords = JSON.parse(localStorage.getItem("blockedWords"));
+// let blockedWords = JSON.parse(localStorage.getItem("blockedWords"));
 
-function removeBlockedWord(elt) {
+const removeBlockedWord = async (elt) => {
     elt.remove();
+    let { blockedWords } = await browser.storage.local.get("blockedWords");
+    
     blockedWords = blockedWords.filter(eltWord => {
         return eltWord.word !== elt.innerHTML;
     });
-    localStorage.setItem("blockedWords", JSON.stringify(blockedWords));
-}
+    // localStorage.setItem("blockedWords", JSON.stringify(blockedWords));
+    browser.storage.local.set({ blockedWords });
+};
 
-if (blockedWords) {
+// Set the current blocked words display in the setting div
+const setWordDivs = async () => {
+    const { blockedWords } = await browser.storage.local.get("blockedWords");
+
     for (let word of blockedWords) {
         const wordDiv = document.createElement('div');
         wordDiv.className = 'chip';
@@ -48,14 +40,18 @@ if (blockedWords) {
         wordDiv.setAttribute('role', 'button');
         wordDiv.tabIndex = 0;
 
-        const tryRemove = () => {
-            const password = localStorage.getItem("password");
-            const enteredPassword = prompt('password:');
-            if (password && password.length > 0) {
+        // Removes the word if the user enters a specific word
+        const tryRemove = async () => {
+            const { password } = await browser.storage.local.get("password");
+            // lenght > 0 means the user as not yet set the password
+            if (password.length > 0) {
+                const enteredPassword = prompt('password:');
                 if (enteredPassword === password) {
                     removeBlockedWord(wordDiv);
                 }
-            } 
+            } else {
+                removeBlockedWord(wordDiv);
+            }
         };
 
         wordDiv.addEventListener('click', tryRemove);
@@ -68,20 +64,26 @@ if (blockedWords) {
 
         root.append(wordDiv);
     }
-}
+};
 
-passwordBt.addEventListener("click", () => {
-    const password = localStorage.getItem("password");
+
+setWordDivs();
+
+passwordBt.addEventListener("click", async () => {
+    const { password } = await browser.storage.local.get("password");
+
     if (password.length > 0) {
         const currentPassword = prompt("Enter current password: ");
         if (currentPassword == password) {
             const newPassword = prompt("Enter new password: ");
             if (newPassword && newPassword.length > 0) {
-                localStorage.setItem("password", newPassword);
+                browser.storage.local.set({ password: newPassword });
             }
         }
     } else {
-        const setPassword = prompt("Enter password: ");
-        localStorage.setItem("password",setPassword);
+        const newPassword = prompt("Enter password: ");
+        if (newPassword && newPassword.length > 0) {
+            browser.storage.local.set({ password: newPassword });
+        }
     }
 });

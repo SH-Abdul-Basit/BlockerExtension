@@ -10,19 +10,15 @@ const pauseVideo = () => {
 browser.runtime.onMessage.addListener((request) => {
     if (request.type == "send_video") {
         pauseVideo();
-        // for (let video in videos) {
-        //     console.log(video);
-        // }
     }
 }); 
 
 const handleWindowBGM = async () => {
     // Accessing the local storage of that page 
-    // We need to get the local storage from the background script
-    let checkedBGM = await browser.storage.local.get("disableBGM");
-    checkedBGM = JSON.parse(checkedBGM.disableBGM);
+    // We need to get the local storage from the extension local storage
+    const { disableBGM } = await browser.storage.local.get("disableBGM");
 
-    if (checkedBGM) {
+    if (disableBGM) {
         pauseVideo();
     }
 };
