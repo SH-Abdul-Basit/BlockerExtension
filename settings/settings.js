@@ -92,9 +92,14 @@ passwordBt.addEventListener("click", async () => {
     }
 });
 
-importSettingsButton.addEventListener("click", () => {
-    console.log("Import JSON");
-    jsonImportFile.click();
+importSettingsButton.addEventListener("click", async () => {
+    if (await passwordExists()) {
+        if (await passwordVarify()) {
+            jsonImportFile.click();
+        }
+    } else {
+        jsonImportFile.click();
+    }
 });
 
 /*
@@ -126,7 +131,7 @@ jsonImportFile.addEventListener('change', (e) => {
   //console.log('Selected file:', selectedFile.result);
   const reader = new FileReader();
 
-  console.log(reader);
+  // Loading the settings 
   reader.onload = (e) => {
     try {
         const settingsData = JSON.parse(e.target.result); // Parse text into JS object
