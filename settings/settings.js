@@ -8,6 +8,10 @@ const endTimeInput = document.getElementById("endTime");
 
 const saveScheduleBt = document.getElementById("saveSchedule");
 
+const importSettingsButton = document.getElementById("importSettingsButton");
+
+const jsonImportFile = document.getElementById("jsonImport");
+
 saveScheduleBt.addEventListener("click", async () => {
     // Doing this way there is a path
     // in which the schdule is not set if the password is not varified
@@ -86,6 +90,54 @@ passwordBt.addEventListener("click", async () => {
             browser.storage.local.set({ password: newPassword });
         }
     }
+});
+
+importSettingsButton.addEventListener("click", () => {
+    console.log("Import JSON");
+    jsonImportFile.click();
+});
+
+/*
+Not currently (2026) supported in 
+async function openFile() {
+  try {
+    // Opens the file picker and returns an array of file handles
+    const [fileHandle] = await window.showOpenFilePicker({
+      types: [{
+        description: 'Images',
+        accept: { 'image/*': ['.png', '.jpg', '.jpeg'] }
+      }],
+      excludeAcceptAllOption: true,
+      multiple: false
+    });
+    
+    const file = await fileHandle.getFile();
+    console.log('File selected:', file.name);
+  } catch (err) {
+    console.error('User cancelled or error occurred:', err);
+  }
+}
+
+document.getElementById('pickerBtn').addEventListener('click', openFile);
+*/
+
+jsonImportFile.addEventListener('change', (e) => {
+  const selectedFile = e.target.files[0];
+  //console.log('Selected file:', selectedFile.result);
+  const reader = new FileReader();
+
+  console.log(reader);
+  reader.onload = (e) => {
+    try {
+        const settingsData = JSON.parse(e.target.result); // Parse text into JS object
+        // console.log(e.target.result);
+        browser.storage.local.set(settingsData);
+    } catch(err) {
+        console.log(err);
+    }
+  };
+
+  reader.readAsText(selectedFile);
 });
 
 const passwordVarify = async () => {

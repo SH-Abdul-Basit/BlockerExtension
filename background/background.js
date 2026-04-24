@@ -3,6 +3,7 @@ const initStorage = async () => {
     console.log("Extension installed");
     await browser.storage.local.clear();
 
+    // "amv", "mmv", "gmv", "music", "song", "tiktok"
     const data = {
         blockedWords: [],
         disableBGM: false,
@@ -27,14 +28,14 @@ function closeSpecificTab(tabId) {
 
 async function closeTabsWithBlockedWords(text, tabId) {
     const { blockedWords } = await browser.storage.local.get("blockedWords");
-    console.log(blockedWords);
+    // console.log(blockedWords);
     // TODO: The keyword detection fails if a keyword is set with sechedule and then that same keyword is removed
     // and then add back with different schedule which is not yet 
     // TODO: Why does blockedWords sometimes become undefined?
 
     if (blockedWords) { // Temporary solution to detect when blockedWords becomes undefined
         for (let word of blockedWords) {
-            console.log("FollowSchdule: " + word.followSchedule, "CheckSchedule: " + await checkWithinSchedule());
+            // console.log("FollowSchdule: " + word.followSchedule, "CheckSchedule: " + await checkWithinSchedule());
             if (word.followSchedule) {
                 // This if is inside inorder to do nothing to a following word even if it is a match
                 if (await checkWithinSchedule()) {
@@ -43,8 +44,10 @@ async function closeTabsWithBlockedWords(text, tabId) {
                     }
                 } 
             } else {
-                console.log("Not following words...");
+                //console.log("Not following words...");
                 if (text && checkBlockedWord(text, word.word)) {
+                    console.log("text: " + text);
+                    console.log("word: " + word.word);
                     closeSpecificTab(tabId);
                 }
             }

@@ -5,7 +5,7 @@
 
   "browser_specific_settings": {
   "gecko": {
-    "id": "content-keyword-blocker@mozilla.org",
+    "id": "ClearTab@gmail.com",
     "data_collection_permissions": {
           "required": [
              "locationInfo"
@@ -47,7 +47,7 @@
   },
 
  "icons": {
-    "48": "icons/icon.png"
+    "48": "icons/icon_48x.png"
   },
 
 

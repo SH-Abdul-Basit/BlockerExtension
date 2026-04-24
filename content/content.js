@@ -7,7 +7,7 @@
 // }
 // sendContentToBackground();
 // setInterval(sendContentToBackground, 5000);
-const pageContent = document.body.innerHTML;
+const pageContent = document.body.innerText;
 browser.runtime.sendMessage({
   type: "html_content",
   data: pageContent
